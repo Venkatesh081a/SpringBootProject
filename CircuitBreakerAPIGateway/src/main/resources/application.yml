@@ -1,0 +1,48 @@
+spring:
+  application:
+    name: GATEWAY-SERVICE
+  cloud:
+    gateway:
+      routes:
+        - id: restaurant-search-service
+          uri: lb://RESTAURANT-SEARCH-SERVICE
+          predicates:
+            - Path=/restaurant/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: restaurant-search-service
+                fallbackuri: forward:/restaurantFallBack
+        - id: order-management-service
+          uri: lb://ORDER-MANAGEMENT-SERVICE
+          predicates:
+            - Path=/order/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: order-management-service
+                fallbackuri: forward:/orderFallBack
+
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    hostname: localhost             
+
+server:
+  port: 8989
+  
+  
+management:
+  endpoints:
+    web:
+      exposure:
+        include: hystrix.stream
+
+
+            
+            
+
